@@ -10,7 +10,7 @@ foreach ($file in Get-ChildItem -LiteralPath $PSScriptRoot -File | Where-Object 
     if ($parseErrors.Count) { throw "Invalid PowerShell in $($file.Name): $($parseErrors.Message -join '; ')" }
 }
 
-foreach ($test in 'Test-AskGPT.ps1', 'Test-Providers.ps1', 'Test-KeyStorage.ps1') {
+foreach ($test in 'Test-AskGPT.ps1', 'Test-Providers.ps1', 'Test-Context.ps1', 'Test-KeyStorage.ps1') {
     # Separate processes isolate module mocks and environment changes from each other.
     & (Join-Path $PSHOME 'pwsh.exe') -NoProfile -File (Join-Path $PSScriptRoot $test)
     if ($LASTEXITCODE -ne 0) { throw "$test failed with exit code $LASTEXITCODE" }

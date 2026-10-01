@@ -9,7 +9,7 @@ Use this repository's **Security > Report a vulnerability** option when availabl
 - Generated commands run only after an explicit Run choice. They execute with the current user's permissions; this module is not a sandbox.
 - Editing returns to the review prompt. Syntax validation does not establish that code is safe.
 - On Windows, saved keys use DPAPI for the current account and computer. Software running as that account can decrypt them. Encryption does not protect a compromised session.
-- The selected provider receives the question and platform information. Questions may themselves contain sensitive data. Provider retention and billing policies apply.
+- The selected provider receives the question, platform information, explicit context, and recent AskGPT turns with command output/errors unless `-NoContext` is used. These can contain sensitive data. `Clear-GptContext` clears local session memory; it does not delete data already sent to a provider. Provider retention and billing policies apply.
 - Environment variable keys override saved keys only for the matching provider.
 - The module sends credentials only to the selected fixed OpenAI API or validated public Azure hostname; HTTP redirects are disabled.
 

@@ -35,7 +35,40 @@ Use single quotes for questions containing PowerShell syntax such as `$`, `|`, `
 - **C** or Enter cancels. Ctrl+C interrupts the operation.
 - Answers without a suggested command just print the explanation.
 
-GPT can make mistakes. Review code before choosing Run. Execution is not sandboxed and can change files or settings. No automatic elevation is performed. Variable and function definitions run in a child scope and do not persist in your caller scope; filesystem and other side effects do persist. Command output is not sent back to GPT.
+GPT can make mistakes. Review code before choosing Run. Execution is not sandboxed and can change files or settings. No automatic elevation is performed. Variable and function definitions run in a child scope and do not persist in your caller scope; filesystem and other side effects do persist.
+
+## Follow-up questions and command results
+
+AskGPT remembers the last four interactions for each provider, endpoint and model/deployment in the current PowerShell session. It includes questions, answers, the final reviewed command, execution status, standard output and errors in the next request. For example:
+
+```powershell
+?? show the five processes using the most memory
+# Choose R to run the suggestion.
+?? show that in megabytes
+?? explain the first result
+```
+
+Context stays in memory and is forgotten when the module is reloaded or the terminal closes. Each turn keeps up to 6,000 characters of output and 4,000 characters each of question, answer and command; truncation is marked. Cancelled commands are explicitly marked as not executed. Execution still requires Run each time. Host-only display, progress, warning and information streams are not captured as results.
+
+**Command results may contain sensitive data.** Captured output is sent to the selected provider on your next contextual question. The current provider's API key is redacted from context, but other secrets are not automatically detected. Use these controls:
+
+```powershell
+Clear-GptContext                       # Forget all providers' session context
+?? 'A standalone question' -NoContext # Neither read nor save automatic context for this turn
+```
+
+PowerShell history does not retain output from commands run outside AskGPT. You can explicitly supply previously captured output or command text:
+
+```powershell
+Get-Process | Select-Object -First 5 | Tee-Object -Variable recentResult
+?? 'Explain these results' -Context ($recentResult | Out-String)
+
+# Include the last normal shell command's text (not its results):
+$lastCommand = (Get-History -Count 1).CommandLine
+?? 'Explain this command' -Context $lastCommand
+```
+
+Explicit `-Context` is limited to 12,000 characters and is sent only with that request, even when `-NoContext` is used. Its contents are not automatically saved for later turns. AskGPT never reruns a previous command to recover output.
 
 ## Configuration
 
@@ -92,7 +125,7 @@ $env:OPENAI_MODEL = 'your-model-id'
 Invoke-GptQuestion -Question 'List running services' -Model 'your-model-id'
 ```
 
-Only your question, PowerShell version and OS description are sent to the selected provider. The module does not collect files, shell history, working-directory contents or environment variables for its prompt. It sends `store: false`; this is not a claim of zero provider retention. Requests are independent, with no chat memory. API calls use the selected provider's account or Azure resource.
+Your question, PowerShell version, OS description, recent AskGPT context (unless `-NoContext`) and any explicit `-Context` are sent to the selected provider. The module does not automatically collect files, shell history, working-directory contents or environment variables for its prompt. Commands you approve can print such data, and that output can become context. Requests use `store: false` and locally replayed history rather than provider-side conversation IDs; this is not a claim of zero provider retention. API calls use the selected provider's account or Azure resource.
 
 ## Load automatically (optional)
 

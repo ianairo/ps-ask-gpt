@@ -31,7 +31,7 @@ Git may prompt you to configure your author name/email or sign into GitHub. The 
 - Wait for the **PowerShell tests** workflow to pass.
 - Enable private vulnerability reporting in the repository's security settings.
 - With your own account, try an answer-only question and a harmless suggestion such as `?? show my PowerShell version`. Verify Run, Edit and Cancel. Verify each provider you intend to advertise as live-tested.
-- Create a GitHub release tagged `v1.2.1-beta.1` and mark it as a **pre-release**. The module's numeric version remains `1.2.1`.
+- Create a GitHub release tagged `v1.3.0-beta.1` and mark it as a **pre-release**. The module's numeric version remains `1.3.0`.
 - Use `CHANGELOG.md` for the release notes, keeping any unverified live-provider limitations explicit. Users can download GitHub's source ZIP; no automatic publishing workflow or API secrets are needed.
 
 The repository URL has intentionally not been embedded in documentation or manifest metadata because its destination is not yet known.
